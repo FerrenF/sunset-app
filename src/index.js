@@ -1,16 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import GalleryFrame from './components/GalleryFrame';
+import GalleryFrameInner from './components/GalleryFrameInner';
 import reportWebVitals from './reportWebVitals';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+
+
+
+
+const appElement = document.getElementById('app_root')
+appElement.classList.add('SunsetsRoot')
+const root = ReactDOM.createRoot(appElement)
+
+
 root.render(
-    <div>
+    <>
   <React.StrictMode>
-    <GalleryFrame />
+    <GalleryFrameInner />
   </React.StrictMode>
-    </div>
+    </>
 );
 
 // If you want to start measuring performance in your app, pass a function

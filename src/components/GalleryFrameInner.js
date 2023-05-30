@@ -3,17 +3,13 @@ import React from 'react'
 
 const CFG_SERVER_ENDPOINT = "http://localhost:3003";
 
-function getImages(directory) {
-  console.log("Accessing directory " + directory);
-  return (
-      <ul>
-        <li><p>Current directory: {directory}</p></li>
-      </ul>
-  );
+const CFG_GLOBAL = {
+  image:{
+    fade_time:200
+  }
 }
-
-class GalleryFrame extends React.Component {
-
+class GalleryFrameInner extends React.Component {
+  uniqId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
   iterator = 0
   state = {
     directories: [],
@@ -26,32 +22,38 @@ class GalleryFrame extends React.Component {
   getDirectories = () => {
     return this.state.directories || null;
   }
-  populateImages(){
-    const curDir = this.getCurrentDirectory();
+
+  begin_populate(){
     const req = new XMLHttpRequest();
     req.onload = () => {
-      const imgObj = JSON.parse(req.responseText).images;
-
-      let dirObj = this.state.directories;
-      dirObj[this.state.selectedDirectory] = {...dirObj[this.state.selectedDirectory], images: imgObj};
-
-      this.setState({...this.state,
-        directories: dirObj,
-        imgPopulated: true
-      })
-    }
-    req.open("GET", CFG_SERVER_ENDPOINT+"/"+curDir.shortname);
-    req.send();
-  }
-  populateDirectories(){
-    const req = new XMLHttpRequest();
-    req.onload = () => {
-
       const dirObj = JSON.parse(JSON.parse(req.responseText).directories);
-      this.setState({...this.state,
+      const tempstate = {...this.state,
         dirPopulated: true,
         directories: dirObj
-      })
+      }
+
+      const curDir = tempstate.directories[tempstate.selectedDirectory];
+
+      req.onload = () => {
+        const imgObj = JSON.parse(req.responseText).images;
+
+        let s = this.state.selectedDirectory;
+        let dirObj = tempstate.directories;
+
+        //poor mans caching
+
+          dirObj[s] = {...dirObj[s], images: imgObj};
+          this.setState({...tempstate,
+            directories: dirObj,
+            imgPopulated: true,
+          })
+
+      }
+
+      req.open("GET", CFG_SERVER_ENDPOINT+"/"+curDir.shortname);
+      req.send();
+
+
     }
     req.open("GET", CFG_SERVER_ENDPOINT);
     req.send();
@@ -62,11 +64,11 @@ class GalleryFrame extends React.Component {
     }
     this.setState({...this.state, imgPopulated: false, selectedDirectory: index, selectedImage: 0});
   }
-  isValidImageIndex(ind){
-    const curDir = this.getCurrentDirectory();
-    return (Array.isArray(curDir.images) && (ind < curDir.images.length) && (ind > -1));
-  }
+
   isValidDirectoryIndex(ind){
+    if(!this.state.dirPopulated){
+      return;
+    }
     const directories = this.getDirectories();
     return (Array.isArray(directories) && (ind < directories.length) && (ind > -1));
   }
@@ -91,12 +93,12 @@ class GalleryFrame extends React.Component {
     return directories[this.state.selectedDirectory];
   }
   renderCurrentDirectory = () => {
+
     if (!this.isValidDirectoryIndex) {
       return (
           <h3>Current Directory: None</h3>
       )
     }
-
     const currentDirectory = this.getCurrentDirectory();
     return (<>
           <h3>Current Directory: {currentDirectory.meta.title}</h3>
@@ -105,22 +107,34 @@ class GalleryFrame extends React.Component {
     )
   }
   renderCurrentImage = () => {
+    if(!this.state.imgPopulated) {
+      return;
+    }
     const curDir = this.getCurrentDirectory();
     const curImage = curDir.images[this.state.selectedImage].name;
     return (
-        <img src={CFG_SERVER_ENDPOINT +"/" +curDir.name+"/"+curImage}></img>
+        <img id={"gallery-img-"+this.uniqId} src={CFG_SERVER_ENDPOINT +"/" +curDir.name+"/"+curImage}></img>
     )
   }
   setCurrentImageIndex(index){
-      this.setState({...this.state, selectedImage:index});
+      const imageElement = document.getElementById("gallery-img-"+this.uniqId)
+      imageElement.style.opacity = '0';
+
+      // Wait for the transition to complete
+      setTimeout(() => {
+
+        this.setState({...this.state, selectedImage:index});
+        setTimeout(() => {
+          imageElement.style.opacity = '1';
+
+
+        }, CFG_GLOBAL.image.fade_time);
+      }, CFG_GLOBAL.image.fade_time);
+
   }
   render() {
-    if(!this.state.dirPopulated){
-      this.populateDirectories();
-      return;
-    }
     if(!this.state.imgPopulated){
-      this.populateImages();
+      this.begin_populate();
       return;
     }
 
@@ -138,7 +152,7 @@ class GalleryFrame extends React.Component {
       );
     }
     const renderImageIndexControls = () =>{
-      const selIndex = this.state.selectedImage;
+
       const curDir = this.getCurrentDirectory();
       const curImgs = curDir.images;
       const len = curImgs.length;
@@ -146,20 +160,20 @@ class GalleryFrame extends React.Component {
       return makeIndexControl(0,len);
     }
     return (
-      <div id="sunset-frame" className="App SunsetsFrame flex-container">
-          <div id="ssframe" className="SunsetDirectories">
+      <div className="SunsetsFrame flex-container">
+          <div className="SunsetDirectories">
             {this.renderDirectories()}
           </div>
           <div className="SunsetControls">
             {this.renderCurrentDirectory()}
             {renderImageIndexControls()}
           </div>
-         <div className="SunsetImageGrid">
-           <div className="SunsetImagePanel">{this.renderCurrentImage()}</div>
+         <div className="SunsetImagePanel">
+           <div>{this.renderCurrentImage()}</div>
         </div>
       </div>
     );
   }
 
 }
-export default GalleryFrame;
+export default GalleryFrameInner;
