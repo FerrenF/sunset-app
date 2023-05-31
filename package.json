@@ -2,6 +2,7 @@
   "name": "sunset-app",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://localhost/sunset",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
@@ -19,7 +20,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "watch": "npm-watch",
-    "dev": "concurrently \"npm run server\" \"npm run start\""
+    "dev": "concurrently \"npm run server\" \"npm run start\"",
+    "deploy": "npm run build && mkdir build/server &&  cp -r server/_* build/server"
   },
   "proxy": "http://localhost:3003",
   "eslintConfig": {

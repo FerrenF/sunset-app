@@ -42,6 +42,42 @@
 .SunsetDirectories ul li{
   font-size:0.8em;
 }
+.SunsetDirectoryList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+}
+
+.SunsetDirectoryListing {
+  margin-bottom: 0px;
+}
+
+.SunsetLink, .SunsetLinkCurrent {
+  display: inline-block;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 3px;
+  background-color: #f5f5f5;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  line-height: 0.6;
+}
+.SunsetLinkCurrent {
+  background-color: #333333; /* Change the background color for the current directory */
+  color: #fff; /* Change the text color for the current directory */
+
+}
+.SunsetLink:hover {
+  background-color: #e0e0e0;
+}
+
+.SunsetLink:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #61dafb;
+}
 
 /* IMAGE / IMAGE PANEL */
 
@@ -66,22 +102,39 @@
 .SunsetImageControl {
   margin-top:0.2em;
   margin-bottom:0.2em;
-  display:flex;
   justify-content:center;
+  display: flex;
 }
 .SunsetImageControl div{
   width: fit-content;
   background-color: aliceblue;
   border: 5px solid;
   border-radius: 5px;
+  display:flex;
+  flex-wrap: wrap;
+  margin-left: 1em;
+  margin-right: 1em;
 }
-.SunsetImageControlIndex {
-  margin-left: 0.1em;
-  margin-right: 0.1em;
+.SunsetImageControl button {
+  display: inline-block;
+  background: none;
+  border: none;
+  font-size: 1em;
+  color: #007bff;
+  text-decoration: underline;
+  cursor: pointer;
 }
+.SunsetImageControl button:focus {
+  outline: none;
+}
+
+.SunsetImageControl button:hover,
+.SunsetImageControl button:active {
+  color: #0056b3;
+}
+
 .SunsetImageControlIndexSelected {
-  margin-left: 0.1em;
-  margin-right: 0.1em;
+
   font-size: 1.2em;
   line-height: 1em;
 }
@@ -91,6 +144,7 @@
 .SunsetControls h3, .SunsetControls h4 {
   margin:0;
 }
+
 
 
 @media only screen and (max-width: 480px) {
@@ -105,6 +159,9 @@
 
   .SunsetImageControlIndexSelected {
     font-size: 1em;
+  }
+  .SunsetLink {
+    font-size: .7em;
   }
 }
 
@@ -127,6 +184,11 @@
   }
   .SunsetControls h4 {
     font-size:.6em;
+  }
+  .SunsetLink {
+    font-size: 2.2vw;
+    line-height: 0.6em;
+    margin-bottom: 0.25em;
   }
 }
 
@@ -151,5 +213,8 @@
   }
   .SunsetControls h4 {
     font-size:.8em;
+  }
+  .SunsetLink {
+    font-size: 1em;
   }
 }
