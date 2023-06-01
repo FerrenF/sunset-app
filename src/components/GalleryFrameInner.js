@@ -13,8 +13,8 @@ const CFG_GLOBAL = {
 }
 
 class GalleryFrameInner extends React.Component {
+
   uniqId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-  iterator = 0
   state = {
     directories: [],
     selectedDirectory:0,
@@ -22,12 +22,14 @@ class GalleryFrameInner extends React.Component {
     dirPopulated: false,
     imgPopulated: false
   }
-
   getDirectories = () => {
     return this.state.directories || null;
   }
 
   preload_images() {
+    if(!this.state.imgPopulated){
+      return;
+    }
     const { directories, selectedDirectory } = this.state;
     const images = directories[selectedDirectory].images;
 
@@ -83,15 +85,23 @@ class GalleryFrameInner extends React.Component {
     return (Array.isArray(directories) && (ind < directories.length) && (ind > -1));
   }
 
+
+
+  getCurrentDirectory = () => {
+    if(!this.isValidDirectoryIndex(this.state.selectedDirectory)){
+      return false;
+    }
+    const directories = this.getDirectories();
+    return directories[this.state.selectedDirectory];
+  }
   renderDirectories = () => {
     const directories = this.getDirectories();
     const currentDirectoryIndex = this.state.selectedDirectory;
-
     return (
         <ul className="SunsetDirectoryList">
           Galleries:
           {directories.map((value, index) => (
-              <li className="SunsetDirectoryListing" key={index}>
+              <li className="SunsetDirectoryListing" key={value.name}>
                 <button
                     className={`SunsetLink${index === currentDirectoryIndex ? ' SunsetLinkCurrent' : ''}`}
                     onClick={() => this.selectDirectory(index)}
@@ -102,34 +112,20 @@ class GalleryFrameInner extends React.Component {
           ))}
         </ul>
     );
-  };
-
-  getCurrentDirectory = () => {
-    if(!this.isValidDirectoryIndex(this.state.selectedDirectory)){
-      return false;
-    }
-    const directories = this.getDirectories();
-    return directories[this.state.selectedDirectory];
   }
-  renderCurrentDirectory = () => {
-
-    if (!this.isValidDirectoryIndex) {
-      return (
-          <h3>Current Directory: None</h3>
-      )
-    }
-    const currentDirectory = this.getCurrentDirectory();
+  renderCurrentDirectory = (directory) => {
+    let currentDirectory = directory||this.getCurrentDirectory()||{meta:{title:"None",description:""}};
     return (<>
           <h3>Current Directory: {currentDirectory.meta.title}</h3>
           <h4>Description: {currentDirectory.meta.description}</h4>
       </>
     )
   }
-  renderCurrentImage = () => {
+  renderImage = (directory) => {
     if(!this.state.imgPopulated) {
       return;
     }
-    const curDir = this.getCurrentDirectory();
+    const curDir = directory;
     const curImage = curDir.images[this.state.selectedImage].name;
     return (
         <img alt={"Gallery image "+this.state.selectedImage} id={"gallery-img-"+this.uniqId} src={CFG_GLOBAL.locations.images +"/" +curDir.name+"/"+curImage}></img>
@@ -151,63 +147,76 @@ class GalleryFrameInner extends React.Component {
       }, CFG_GLOBAL.image.fade_time);
 
   }
+  makeIndexControl = (min, max, ) =>{
+
+    const len = max-min;
+    const arr = Array.from(Array(len).keys());
+    return (
+        <div className="SunsetImageControl">
+          <div>
+            {arr.map((value, index) => {
+              const label = index + min + 1;
+              const event = () => this.setCurrentImageIndex(label - 1);
+              const inhClass =
+                  label - 1 === this.state.selectedImage
+                      ? "SunsetImageControlIndexSelected"
+                      : "SunsetImageControlIndex";
+              return (
+                  <button
+                      className={inhClass}
+                      onClick={event}
+                      key={index}
+                  >
+                    {label}
+                  </button>
+              );
+            })}
+          </div>
+        </div>
+    )
+  }
+  renderImageIndexControls = (dir) =>{
+    const curImgs = dir.images;
+    const len = curImgs.length;
+    return this.makeIndexControl(0,len);
+  }
   render() {
     if(!this.state.imgPopulated){
       this.begin_populate();
       return;
     }
     this.preload_images();
+    const curDir = this.getCurrentDirectory();
 
-    const makeIndexControl = (min, max) =>{
-      const len = max-min;
-      const arr = Array.from(Array(len).keys());
-      return (
-          <div className="SunsetImageControl">
-            <div>
-              {arr.map((value, index) => {
-                const label = index + min + 1;
-                const event = () => this.setCurrentImageIndex(label - 1);
-                const inhClass =
-                    label - 1 === this.state.selectedImage
-                        ? "SunsetImageControlIndexSelected"
-                        : "SunsetImageControlIndex";
-                return (
-                    <button
-                        className={inhClass}
-                        onClick={event}
-                        key={index}
-                    >
-                      {label}
-                    </button>
-                );
-              })}
-            </div>
-          </div>
-      )
-    }
-    const renderImageIndexControls = () =>{
 
-      const curDir = this.getCurrentDirectory();
-      const curImgs = curDir.images;
-      const len = curImgs.length;
 
-      return makeIndexControl(0,len);
-    }
+    const MemoizedDirectories = React.memo(this.renderDirectories);
     return (
-      <div className="SunsetsFrame flex-container">
+      <>
           <div className="SunsetDirectories">
-            {this.renderDirectories()}
+            <MemoizedDirectories/>
           </div>
           <div className="SunsetControls">
-            {this.renderCurrentDirectory()}
-            {renderImageIndexControls()}
+            {this.renderCurrentDirectory(curDir)}
+            {this.renderImageIndexControls(curDir)}
           </div>
          <div className="SunsetImagePanel">
-           <div>{this.renderCurrentImage()}</div>
+           <div>{this.renderImage(curDir)}</div>
         </div>
-      </div>
-    );
+      </>
+    )
   }
 
 }
-export default GalleryFrameInner;
+
+class SunsetGallery extends React.Component{
+  render() {
+    return(<div className="SunsetsFrame flex-container">
+      <GalleryFrameInner/>
+    </div>)
+  }
+}
+export default SunsetGallery;
+
+
+

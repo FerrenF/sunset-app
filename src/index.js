@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import GalleryFrameInner from './components/GalleryFrameInner';
+import SunsetGallery from './components/GalleryFrameInner';
 import reportWebVitals from './reportWebVitals';
 
 
@@ -16,7 +16,7 @@ const root = ReactDOM.createRoot(appElement)
 root.render(
     <>
   <React.StrictMode>
-    <GalleryFrameInner />
+    <SunsetGallery />
   </React.StrictMode>
     </>
 );
