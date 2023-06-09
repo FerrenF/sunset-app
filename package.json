@@ -17,11 +17,12 @@
     "server": "nodemon server/index.js --quiet --legacy-watch",
     "start": "WATCHPACK_POLLING=true react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "watch": "npm-watch",
     "dev": "concurrently \"npm run server\" \"npm run start\"",
-    "deploy": "npm run build && mkdir build/server &&  cp -r server/_* build/server"
+    "deploy": "npm run build && mkdir build/server &&  cp -r server/_* build/server",
+    "prod": "npm run build && cp -f -r build/* prod/ &&  cp -f -r server/* prod/server/ && rm -r prod/server/ven* && rm -r prod/server/node*"
   },
   "proxy": "http://localhost:3003",
   "eslintConfig": {
@@ -53,7 +54,8 @@
   "devDependencies": {
     "concurrently": "^8.0.1",
     "nodemon": "^2.0.22",
-    "npm-watch": "^0.11.0"
+    "npm-watch": "^0.11.0",
+    "react-app-rewired": "^2.2.1"
   },
   "dev": {
     "patterns": [

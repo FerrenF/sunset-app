@@ -1,17 +1,7 @@
 import '../App.css';
 import React from 'react'
 
-const CFG_GLOBAL = {
-  image:{
-    fade_time:200
-  },
-  locations:{
-    server:"http://localhost:3003",
-    images:"http://localhost/server"
-
-  }
-}
-
+const cfg = window.cfgGlobal;
 class GalleryFrameInner extends React.Component {
 
   uniqId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
@@ -62,12 +52,12 @@ class GalleryFrameInner extends React.Component {
 
       }
 
-      req.open("GET", CFG_GLOBAL.locations.server+"/"+curDir.shortname);
+      req.open("GET", cfg.locations.server+"/"+curDir.shortname);
       req.send();
 
 
     }
-    req.open("GET", CFG_GLOBAL.locations.server);
+    req.open("GET", cfg.locations.server);
     req.send();
   }
   selectDirectory(index){
@@ -128,7 +118,7 @@ class GalleryFrameInner extends React.Component {
     const curDir = directory;
     const curImage = curDir.images[this.state.selectedImage].name;
     return (
-        <img alt={"Gallery image "+this.state.selectedImage} id={"gallery-img-"+this.uniqId} src={CFG_GLOBAL.locations.images +"/" +curDir.name+"/"+curImage}></img>
+        <img alt={"Gallery image "+this.state.selectedImage} id={"gallery-img-"+this.uniqId} src={cfg.locations.images +"/" +curDir.name+"/"+curImage}></img>
     )
   }
   setCurrentImageIndex(index){
@@ -143,8 +133,8 @@ class GalleryFrameInner extends React.Component {
           imageElement.style.opacity = '1';
 
 
-        }, CFG_GLOBAL.image.fade_time);
-      }, CFG_GLOBAL.image.fade_time);
+        }, cfg.image.fade_time);
+      }, cfg.image.fade_time);
 
   }
   makeIndexControl = (min, max, ) =>{
@@ -206,6 +196,7 @@ class GalleryFrameInner extends React.Component {
       </>
     )
   }
+
 
 }
 
